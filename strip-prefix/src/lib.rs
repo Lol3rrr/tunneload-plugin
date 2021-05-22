@@ -4,7 +4,7 @@ use tunneload_plugin::{request, MiddlewareRequest};
 fn handle_req(req: MiddlewareRequest) -> Result<(), ()> {
     let path = req.get_path();
 
-    let prefix = "";
+    let prefix = "/test";
 
     let n_path = path.strip_prefix(prefix).unwrap();
     req.set_path(n_path);
