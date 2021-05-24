@@ -1,15 +1,13 @@
 [package]
-name = "tunneload-plugin-macros"
+name = "set-header"
 version = "0.1.0"
 authors = ["lol3rrr <s.loler03@gmail.com>"]
 edition = "2018"
 
 [lib]
-proc-macro = true
+crate-type = ["cdylib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-syn = { version = "1.0.72", features = ["full", "fold"] }
-proc-macro2 = { version = "1.0.27" }
-quote = "1.0"
+tunneload-plugin = { path = "../tunneload-plugin" }

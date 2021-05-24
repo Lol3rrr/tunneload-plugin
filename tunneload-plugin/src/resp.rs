@@ -1,33 +1,31 @@
-use stream_httparse::Method;
+use stream_httparse::StatusCode;
 
 use crate::raw;
 
-/// A thin "Wrapper" to make it easier to interact with
-/// the current Request from Tunneload.
+/// A thin "Wrapper" to make it easier to interact with the
+/// current Response from Tunneload
 ///
 /// This will perform all the needed raw calls to Tunneload
 /// and provides a safe API for the user
-pub struct MiddlewareRequest {
-    path_length: usize,
+pub struct MiddlewareResponse {
     body_size: usize,
     max_header_length: usize,
 }
 
-impl MiddlewareRequest {
-    /// Creates a new Request instance with the given Parameters for better
-    /// Performance
-    pub fn new(path_length: i32, body_size: i32, max_header_length: i32) -> Self {
+impl MiddlewareResponse {
+    /// Creates a new Response instance
+    pub fn new(body_size: i32, max_header_length: i32) -> Self {
         Self {
-            path_length: path_length as usize,
             body_size: body_size as usize,
             max_header_length: max_header_length as usize,
         }
     }
 
-    /// Loads the Method from Tunneload
-    pub fn get_method(&self) -> Option<Method> {
-        let code = unsafe { raw::get_method() };
-        Method::wasm_deserialize(code)
+    /// Loads the StatusCode of the Response from Tunneload
+    pub fn get_status_code(&self) -> StatusCode {
+        let raw_code = unsafe { raw::get_status_code() };
+
+        StatusCode::wasm_deserialize(raw_code).unwrap()
     }
 
     /// Updates the Headers of the Request by adding/overwriting
@@ -41,33 +39,6 @@ impl MiddlewareRequest {
                 value.len() as i32,
             );
         }
-    }
-
-    /// Attempts to load the Path of the Request from Tunneload
-    pub fn get_path(&self) -> String {
-        let mut buffer: Vec<u8> = Vec::with_capacity(self.path_length);
-
-        let addr = buffer.as_ptr() as i32;
-        unsafe {
-            raw::get_path(addr);
-            buffer.set_len(self.path_length);
-        }
-
-        String::from_utf8(buffer).unwrap()
-    }
-
-    /// Sets the Path of the Request to the new given Path
-    pub fn set_path(&self, n_path: &str) {
-        unsafe {
-            raw::set_path(n_path.as_ptr() as i32, n_path.len() as i32);
-        }
-    }
-
-    /// Checks if a Header with the given Key is present on the Request
-    pub fn has_header(&self, key: &str) -> bool {
-        let value = unsafe { raw::has_header(key.as_ptr() as i32, key.len() as i32) };
-
-        value != 0
     }
 
     /// Attempts to load the Value of the Header with the matching
@@ -102,7 +73,7 @@ impl MiddlewareRequest {
         buffer
     }
 
-    /// Sets the Body on the Request to the given Data
+    /// Sets the Body on the Response to the given Data
     pub fn set_body(&self, data: &[u8]) {
         unsafe {
             raw::set_body(data.as_ptr() as i32, data.len() as i32);

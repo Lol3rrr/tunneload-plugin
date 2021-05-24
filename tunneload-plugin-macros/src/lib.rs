@@ -1,53 +1,32 @@
 use proc_macro::TokenStream;
-use quote::quote;
-use syn::{parse_macro_input, ItemFn};
+use syn::{parse_macro_input, AttributeArgs, ItemFn};
+
+pub(crate) mod util;
+
+mod parse_macro;
+mod request_macro;
+mod response_macro;
 
 #[proc_macro_attribute]
-pub fn request(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn request(attr: TokenStream, input: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(input as ItemFn);
-    let handler_signature = input_fn.sig.clone();
-    let handler_name = handler_signature.ident;
+    let attributes = parse_macro_input!(attr as AttributeArgs);
 
-    // TODO
-    // Check if the given function also accepts a MiddlewareRequest
-
-    let gen = quote! {
-        #[no_mangle]
-        pub extern "C" fn apply_req() -> i32 {
-            #input_fn
-
-            let request = tunneload_plugin::MiddlewareRequest::new();
-
-            // TODO
-            // Change this to return a Response as Err value
-            let result: Result<(), ()> = #handler_name(request);
-
-            match result {
-                Ok(_) => -1,
-                // TODO
-                // This should return the Error Response to
-                // the Host
-                Err(_) => 0,
-            }
-        }
-    };
-
-    gen.into()
+    request_macro::parse_request(attributes, input_fn).into()
 }
 
 #[proc_macro_attribute]
-pub fn response(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn response(attr: TokenStream, input: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(input as ItemFn);
-    let handler_signature = input_fn.sig.clone();
-    let handler_name = handler_signature.ident;
+    let attributes = parse_macro_input!(attr as AttributeArgs);
 
-    let gen = quote! {
-        #[no_mangle]
-        pub extern "C" fn apply_resp() {
-            #input_fn
-            #handler_name();
-        }
-    };
+    response_macro::parse_response(attributes, input_fn).into()
+}
 
-    gen.into()
+#[proc_macro_attribute]
+pub fn parse_config(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let input_fn = parse_macro_input!(input as ItemFn);
+    let attributes = parse_macro_input!(attr as AttributeArgs);
+
+    parse_macro::parse_parse(attributes, input_fn).into()
 }

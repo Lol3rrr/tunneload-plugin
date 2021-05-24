@@ -3,4 +3,5 @@ members = [
 	"tunneload-plugin",
 	"tunneload-plugin-macros",
 	"strip-prefix",
+	"set-header",
 ]
