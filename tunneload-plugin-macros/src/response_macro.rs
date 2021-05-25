@@ -55,7 +55,7 @@ pub fn parse_response(
         }
     };
 
-    let gen = quote! {
+    quote! {
         #[no_mangle]
         pub extern "C" fn apply_resp(config_size: i32, body_size: i32, max_header_length: i32) {
             #input_fn
@@ -64,7 +64,5 @@ pub fn parse_response(
 
             #calls_tokens
         }
-    };
-
-    gen.into()
+    }
 }

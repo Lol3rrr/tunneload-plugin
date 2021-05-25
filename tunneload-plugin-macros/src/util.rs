@@ -16,11 +16,10 @@ pub fn find_config_type(attributes: &[syn::NestedMeta]) -> Option<Ident> {
         };
 
         let segments = &path.segments;
-        for segment in segments {
-            let ident = &segment.ident;
-
-            return Some(ident.clone());
+        if segments.is_empty() {
+            continue;
         }
+        return Some(segments[0].ident.clone());
     }
 
     None

@@ -22,7 +22,7 @@ pub fn parse_parse(
         };
     }
 
-    let gen = quote! {
+    quote! {
         #[no_mangle]
         pub extern "C" fn parse_config(config_string_size: i32) -> i32 {
             #input_fn
@@ -39,11 +39,9 @@ pub fn parse_parse(
             result_buffer.extend_from_slice(&(config_size as i32).to_be_bytes());
 
             let buffer_ptr = result_buffer.as_ptr();
-            std::mem::forget(buffer_ptr);
+            std::mem::forget(result_buffer);
 
             buffer_ptr as i32
         }
-    };
-
-    gen.into()
+    }
 }
