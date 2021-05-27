@@ -31,11 +31,11 @@ pub fn parse_parse(
 
             let config = #handler_name(config_string);
 
-            let (cfg_ptr, config_size) = tunneload_plugin::Config::serialize_data(&config);
-            std::mem::forget(config);
+            let config_data = tunneload_plugin::Config::serialize_data(&config);
+            let config_size = tunneload_plugin::Config::len(&config);
 
             let mut result_buffer = Vec::with_capacity(8);
-            result_buffer.extend_from_slice(&(cfg_ptr as i32).to_be_bytes());
+            result_buffer.extend_from_slice(&((config_data.as_ptr()) as i32).to_be_bytes());
             result_buffer.extend_from_slice(&(config_size as i32).to_be_bytes());
 
             let buffer_ptr = result_buffer.as_ptr();

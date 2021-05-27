@@ -3,6 +3,7 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
 pub(crate) mod util;
 
+mod config_derive;
 mod parse_macro;
 mod request_macro;
 mod response_macro;
@@ -29,4 +30,11 @@ pub fn parse_config(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes = parse_macro_input!(attr as AttributeArgs);
 
     parse_macro::parse_parse(attributes, input_fn).into()
+}
+
+#[proc_macro_derive(Config)]
+pub fn derive_config(input: TokenStream) -> TokenStream {
+    let derive_input = parse_macro_input!(input);
+
+    config_derive::parse_derive(derive_input).into()
 }

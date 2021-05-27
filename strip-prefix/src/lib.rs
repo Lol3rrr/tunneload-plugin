@@ -24,13 +24,16 @@ struct PrefixConfig {
 }
 
 impl Config for PrefixConfig {
-    fn serialize_data(&self) -> (*const u8, usize) {
-        (self.content.as_bytes().as_ptr(), self.content.len())
+    fn serialize_data(&self) -> Vec<u8> {
+        self.content.as_bytes().to_vec()
     }
     fn deserialize_data(addr: *mut u8, size: usize) -> Option<Self> {
         let content = unsafe { String::from_raw_parts(addr, size, size) };
 
         Some(Self { content })
+    }
+    fn len(&self) -> usize {
+        String::len(&self.content)
     }
 }
 

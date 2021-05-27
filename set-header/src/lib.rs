@@ -36,3 +36,11 @@ fn handle_resp(resp: MiddlewareResponse) {
         resp.set_header("result-key", "result-false");
     }
 }
+
+use tunneload_plugin::Config;
+
+#[derive(Config)]
+pub struct Test {
+    prefix: String,
+    other: Vec<u8>,
+}
