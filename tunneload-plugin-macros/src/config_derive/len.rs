@@ -1,32 +1,57 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields};
+use syn::{Data, DeriveInput, Ident};
+
+use crate::config_derive::util;
+
+fn len_names(names: &[Ident]) -> TokenStream {
+    let mut result = quote! { 0 };
+
+    for name in names.iter() {
+        result.extend(quote! {
+            + tunneload_plugin::Config::len(#name) + 4
+        });
+    }
+
+    result
+}
 
 pub fn parse(input: &DeriveInput) -> TokenStream {
     let length_calc = match &input.data {
-        Data::Struct(derive_struct) => match &derive_struct.fields {
-            Fields::Named(named_fields) => {
-                let mut length_calc = quote! { 0 };
-                for tmp in &named_fields.named {
-                    let tmp_ident = tmp.ident.clone().unwrap();
-
-                    let addition = quote! {
-                        + tunneload_plugin::Config::len(&self.#tmp_ident) + 4
-                    };
-                    length_calc.extend(addition);
-                }
-
-                length_calc
+        Data::Struct(derive_struct) => {
+            let mut length_calc = quote! { 0 };
+            let names = util::names_from_field(&derive_struct.fields);
+            for name in names.iter() {
+                length_calc.extend(quote! {
+                    + tunneload_plugin::Config::len(&self.#name) + 4
+                });
             }
-            _ => {
-                quote! {
-                    0
-                }
+
+            length_calc
+        }
+        Data::Enum(derive_enum) => {
+            let mut match_inner = quote! {};
+            for tmp_var in &derive_enum.variants {
+                let names = util::names_from_field(&tmp_var.fields);
+                let var_match_name = util::self_enum_variant(&tmp_var.ident, &names);
+
+                let len_calc = len_names(&names);
+
+                match_inner.extend(quote! {
+                    #var_match_name => 1 + #len_calc,
+                });
             }
-        },
-        _ => {
+
             quote! {
-                0
+                match &self {
+                    #match_inner
+                    _ => 0,
+                }
+            }
+        }
+        Data::Union(_derive_union) => {
+            quote! {
+                compile_error!("Unions are not yet supported");
             }
         }
     };

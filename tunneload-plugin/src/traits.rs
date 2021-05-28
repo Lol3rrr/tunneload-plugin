@@ -11,9 +11,8 @@ pub trait Config: Sized {
     /// into the Configuration for the Plugin
     ///
     /// # Params:
-    /// * A Ptr to the beginning of the block of memory
-    /// * The Size of the block of memory
-    fn deserialize_data(addr: *mut u8, size: usize) -> Option<Self>;
+    /// * The block of memory
+    fn deserialize_data(data: &[u8]) -> Option<Self>;
 
     /// Returns the Length of the serialized Data
     fn len(&self) -> usize;
@@ -24,8 +23,11 @@ impl Config for String {
         self.as_bytes().to_vec()
     }
 
-    fn deserialize_data(addr: *mut u8, size: usize) -> Option<Self> {
-        let content = unsafe { String::from_raw_parts(addr, size, size) };
+    fn deserialize_data(data: &[u8]) -> Option<Self> {
+        let content = match String::from_utf8(data.to_vec()) {
+            Ok(c) => c,
+            Err(_) => return None,
+        };
 
         Some(content)
     }
@@ -40,8 +42,8 @@ impl Config for Vec<u8> {
         self.clone()
     }
 
-    fn deserialize_data(addr: *mut u8, size: usize) -> Option<Self> {
-        unsafe { Some(Vec::from_raw_parts(addr, size, size)) }
+    fn deserialize_data(data: &[u8]) -> Option<Self> {
+        Some(data.to_vec())
     }
 
     fn len(&self) -> usize {

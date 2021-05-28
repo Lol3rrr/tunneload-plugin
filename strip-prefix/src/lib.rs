@@ -27,8 +27,8 @@ impl Config for PrefixConfig {
     fn serialize_data(&self) -> Vec<u8> {
         self.content.as_bytes().to_vec()
     }
-    fn deserialize_data(addr: *mut u8, size: usize) -> Option<Self> {
-        let content = unsafe { String::from_raw_parts(addr, size, size) };
+    fn deserialize_data(data: &[u8]) -> Option<Self> {
+        let content = String::from_utf8(data.to_vec()).unwrap();
 
         Some(Self { content })
     }

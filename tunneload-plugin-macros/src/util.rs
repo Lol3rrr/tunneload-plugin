@@ -39,7 +39,7 @@ pub fn load_config(config_var_name: &Ident, config_type: Ident) -> TokenStream {
             buffer.set_len(config_usize);
         }
 
-        let #config_var_name = #config_type::deserialize_data(buffer.as_mut_ptr(), config_usize).unwrap();
+        let #config_var_name = #config_type::deserialize_data(&buffer).unwrap();
         std::mem::forget(buffer);
     }
 }

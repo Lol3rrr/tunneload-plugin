@@ -5,6 +5,7 @@ use syn::DeriveInput;
 mod deserialize;
 mod len;
 mod serialize;
+mod util;
 
 pub fn parse_derive(input: DeriveInput) -> TokenStream {
     let type_name = input.ident.clone();
