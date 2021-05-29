@@ -5,8 +5,7 @@ use syn::{Data, DeriveInput, Ident};
 use crate::config_derive::util;
 
 fn len_names(names: &[Ident]) -> TokenStream {
-    let mut result = quote! { 0 };
-
+    let mut result = quote! {};
     for name in names.iter() {
         result.extend(quote! {
             + tunneload_plugin::Config::len(#name) + 4
@@ -38,7 +37,7 @@ pub fn parse(input: &DeriveInput) -> TokenStream {
                 let len_calc = len_names(&names);
 
                 match_inner.extend(quote! {
-                    #var_match_name => 1 + #len_calc,
+                    #var_match_name => 1 #len_calc,
                 });
             }
 

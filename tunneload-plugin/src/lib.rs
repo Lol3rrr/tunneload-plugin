@@ -6,7 +6,7 @@
 pub mod raw;
 
 pub use stream_httparse::{Header, Headers, Response, StatusCode};
-pub use tunneload_plugin_macros::{parse_config, request, response, Config};
+pub use tunneload_plugin_macros::{parse_config, Config, MiddlewarePlugin};
 
 mod req;
 pub use req::*;
@@ -28,4 +28,4 @@ pub fn load_config_str(raw_size: i32) -> String {
 }
 
 mod traits;
-pub use traits::Config;
+pub use traits::{Config, Middleware};

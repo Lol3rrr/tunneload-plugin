@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{Data, DataEnum, DeriveInput, Field, Fields, FieldsNamed, FieldsUnnamed, Ident, Type};
+use syn::{Data, DataEnum, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, Ident, Type};
 
 use crate::config_derive::util;
 
@@ -16,13 +16,6 @@ fn parse_code(result_ident: &Ident, ty: &Type) -> TokenStream {
     }
 }
 
-fn parse_named_field(field: &Field) -> TokenStream {
-    let tmp_ident = field.ident.clone().unwrap();
-    let tmp_type = field.ty.clone();
-
-    parse_code(&tmp_ident, &tmp_type)
-}
-
 fn parse_named(fields: &FieldsNamed) -> TokenStream {
     let mut result = quote! {
         use std::convert::TryInto;
@@ -31,7 +24,10 @@ fn parse_named(fields: &FieldsNamed) -> TokenStream {
     };
 
     for tmp in fields.named.iter() {
-        result.extend(parse_named_field(tmp));
+        let tmp_ident = tmp.ident.as_ref().unwrap();
+        let tmp_type = &tmp.ty;
+
+        result.extend(parse_code(tmp_ident, tmp_type));
     }
 
     let mut struct_creation = quote! {};
@@ -105,14 +101,18 @@ pub fn parse(input: &DeriveInput) -> TokenStream {
         Data::Struct(derive_struct) => match &derive_struct.fields {
             Fields::Named(named_fields) => parse_named(named_fields),
             Fields::Unnamed(unnamed_fields) => parse_unnamed(unnamed_fields),
-            _ => quote! {
-                None
-            },
+            Fields::Unit => {
+                quote! {
+                    Some(Self {})
+                }
+            }
         },
         Data::Enum(derive_enum) => parse_enum(derive_enum),
-        _ => quote! {
-            None
-        },
+        Data::Union(_derive_union) => {
+            quote! {
+                compile_error!("The Derive-Implementation is not yet implemented for Union-Datatypes");
+            }
+        }
     };
 
     quote! {
