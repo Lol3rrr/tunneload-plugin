@@ -40,6 +40,7 @@ pub fn parse_parse(
 
             let buffer_ptr = result_buffer.as_ptr();
             std::mem::forget(result_buffer);
+            std::mem::forget(config_data);
 
             buffer_ptr as i32
         }

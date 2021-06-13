@@ -23,7 +23,7 @@ impl MiddlewareResponse {
 
     /// Loads the StatusCode of the Response from Tunneload
     pub fn get_status_code(&self) -> StatusCode {
-        let raw_code = unsafe { raw::get_status_code() };
+        let raw_code = unsafe { raw::action_get_status_code() };
 
         StatusCode::wasm_deserialize(raw_code).unwrap()
     }
@@ -32,7 +32,7 @@ impl MiddlewareResponse {
     /// a Header with the given Key-Value pair
     pub fn set_header(&self, key: &str, value: &str) {
         unsafe {
-            raw::set_header_text(
+            raw::action_set_header(
                 key.as_ptr() as i32,
                 key.len() as i32,
                 value.as_ptr() as i32,
@@ -46,7 +46,7 @@ impl MiddlewareResponse {
     pub fn get_header(&self, key: &str) -> Option<String> {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.max_header_length);
         unsafe {
-            let actual_length = raw::get_header(
+            let actual_length = raw::action_get_header(
                 buffer.as_ptr() as i32,
                 key.as_ptr() as i32,
                 key.len() as i32,
@@ -66,7 +66,7 @@ impl MiddlewareResponse {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.body_size);
 
         unsafe {
-            raw::get_body(buffer.as_ptr() as i32);
+            raw::action_get_body(buffer.as_ptr() as i32);
             buffer.set_len(self.body_size);
         }
 
@@ -76,7 +76,7 @@ impl MiddlewareResponse {
     /// Sets the Body on the Response to the given Data
     pub fn set_body(&self, data: &[u8]) {
         unsafe {
-            raw::set_body(data.as_ptr() as i32, data.len() as i32);
+            raw::action_set_body(data.as_ptr() as i32, data.len() as i32);
         }
     }
 }

@@ -27,5 +27,7 @@ pub fn load_config_str(raw_size: i32) -> String {
     String::from_utf8(buffer).unwrap()
 }
 
+pub mod logging;
+
 mod traits;
 pub use traits::{Config, Middleware};

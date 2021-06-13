@@ -26,7 +26,7 @@ impl MiddlewareRequest {
 
     /// Loads the Method from Tunneload
     pub fn get_method(&self) -> Option<Method> {
-        let code = unsafe { raw::get_method() };
+        let code = unsafe { raw::action_get_method() };
         Method::wasm_deserialize(code)
     }
 
@@ -34,7 +34,7 @@ impl MiddlewareRequest {
     /// a Header with the given Key-Value pair
     pub fn set_header(&self, key: &str, value: &str) {
         unsafe {
-            raw::set_header_text(
+            raw::action_set_header(
                 key.as_ptr() as i32,
                 key.len() as i32,
                 value.as_ptr() as i32,
@@ -49,7 +49,7 @@ impl MiddlewareRequest {
 
         let addr = buffer.as_ptr() as i32;
         unsafe {
-            raw::get_path(addr);
+            raw::action_get_path(addr);
             buffer.set_len(self.path_length);
         }
 
@@ -59,13 +59,13 @@ impl MiddlewareRequest {
     /// Sets the Path of the Request to the new given Path
     pub fn set_path(&self, n_path: &str) {
         unsafe {
-            raw::set_path(n_path.as_ptr() as i32, n_path.len() as i32);
+            raw::action_set_path(n_path.as_ptr() as i32, n_path.len() as i32);
         }
     }
 
     /// Checks if a Header with the given Key is present on the Request
     pub fn has_header(&self, key: &str) -> bool {
-        let value = unsafe { raw::has_header(key.as_ptr() as i32, key.len() as i32) };
+        let value = unsafe { raw::action_has_header(key.as_ptr() as i32, key.len() as i32) };
 
         value != 0
     }
@@ -75,7 +75,7 @@ impl MiddlewareRequest {
     pub fn get_header(&self, key: &str) -> Option<String> {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.max_header_length);
         unsafe {
-            let actual_length = raw::get_header(
+            let actual_length = raw::action_get_header(
                 buffer.as_ptr() as i32,
                 key.as_ptr() as i32,
                 key.len() as i32,
@@ -95,7 +95,7 @@ impl MiddlewareRequest {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.body_size);
 
         unsafe {
-            raw::get_body(buffer.as_ptr() as i32);
+            raw::action_get_body(buffer.as_ptr() as i32);
             buffer.set_len(self.body_size);
         }
 
@@ -105,7 +105,7 @@ impl MiddlewareRequest {
     /// Sets the Body on the Request to the given Data
     pub fn set_body(&self, data: &[u8]) {
         unsafe {
-            raw::set_body(data.as_ptr() as i32, data.len() as i32);
+            raw::action_set_body(data.as_ptr() as i32, data.len() as i32);
         }
     }
 }
