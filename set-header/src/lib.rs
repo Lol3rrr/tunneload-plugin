@@ -28,7 +28,7 @@ impl Middleware for TestConf {
         Ok(())
     }
 
-    fn handle_response(&self, resp: MiddlewareResponse) {
+    fn handle_response(&self, _req: &MiddlewareRequest, resp: MiddlewareResponse) {
         let value = match resp.get_header("test-key") {
             Some(v) => v,
             None => return,

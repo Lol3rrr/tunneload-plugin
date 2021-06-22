@@ -4,6 +4,7 @@
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
+mod acceptor_plugin;
 mod config_derive;
 mod middleware_plugin;
 mod parse_macro;
@@ -34,4 +35,15 @@ pub fn MiddlewarePlugin(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes = parse_macro_input!(attr as AttributeArgs);
 
     middleware_plugin::impl_middleware_plugin(attributes, input_impl).into()
+}
+
+/// Exports the Acceptor-Trait-Implementation with the Acceptor-Plugin API
+/// for usage in Tunneload
+#[allow(non_snake_case)]
+#[proc_macro_attribute]
+pub fn AcceptorPlugin(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let input_impl: syn::ItemImpl = parse_macro_input!(input);
+    let attributes = parse_macro_input!(attr as AttributeArgs);
+
+    acceptor_plugin::impl_acceptor_plugin(attributes, input_impl).into()
 }

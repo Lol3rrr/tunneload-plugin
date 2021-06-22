@@ -1,6 +1,6 @@
 use stream_httparse::StatusCode;
 
-use crate::raw;
+use crate::raw::{self, RESPONSE_RESSOURCE_ID};
 
 /// A thin "Wrapper" to make it easier to interact with the
 /// current Response from Tunneload
@@ -33,6 +33,7 @@ impl MiddlewareResponse {
     pub fn set_header(&self, key: &str, value: &str) {
         unsafe {
             raw::action_set_header(
+                RESPONSE_RESSOURCE_ID,
                 key.as_ptr() as i32,
                 key.len() as i32,
                 value.as_ptr() as i32,
@@ -47,6 +48,7 @@ impl MiddlewareResponse {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.max_header_length);
         unsafe {
             let actual_length = raw::action_get_header(
+                RESPONSE_RESSOURCE_ID,
                 buffer.as_ptr() as i32,
                 key.as_ptr() as i32,
                 key.len() as i32,
@@ -66,7 +68,7 @@ impl MiddlewareResponse {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.body_size);
 
         unsafe {
-            raw::action_get_body(buffer.as_ptr() as i32);
+            raw::action_get_body(RESPONSE_RESSOURCE_ID, buffer.as_ptr() as i32);
             buffer.set_len(self.body_size);
         }
 
@@ -76,7 +78,11 @@ impl MiddlewareResponse {
     /// Sets the Body on the Response to the given Data
     pub fn set_body(&self, data: &[u8]) {
         unsafe {
-            raw::action_set_body(data.as_ptr() as i32, data.len() as i32);
+            raw::action_set_body(
+                RESPONSE_RESSOURCE_ID,
+                data.as_ptr() as i32,
+                data.len() as i32,
+            );
         }
     }
 }

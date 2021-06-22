@@ -1,0 +1,18 @@
+[package]
+name = "load-testing-acceptor"
+version = "0.1.0"
+authors = ["lol3rrr <s.loler03@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tunneload-plugin = { path = "../tunneload-plugin" }
+
+tokio =  { version = "1.6", default_features = false, features = ["rt"] }
+futures = "0.3"
+
+log = "0.4"

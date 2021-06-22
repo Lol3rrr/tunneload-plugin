@@ -1,6 +1,6 @@
 use stream_httparse::Method;
 
-use crate::raw;
+use crate::raw::{self, REQUEST_RESSOURCE_ID};
 
 /// A thin "Wrapper" to make it easier to interact with
 /// the current Request from Tunneload.
@@ -35,6 +35,7 @@ impl MiddlewareRequest {
     pub fn set_header(&self, key: &str, value: &str) {
         unsafe {
             raw::action_set_header(
+                REQUEST_RESSOURCE_ID,
                 key.as_ptr() as i32,
                 key.len() as i32,
                 value.as_ptr() as i32,
@@ -65,7 +66,9 @@ impl MiddlewareRequest {
 
     /// Checks if a Header with the given Key is present on the Request
     pub fn has_header(&self, key: &str) -> bool {
-        let value = unsafe { raw::action_has_header(key.as_ptr() as i32, key.len() as i32) };
+        let value = unsafe {
+            raw::action_has_header(REQUEST_RESSOURCE_ID, key.as_ptr() as i32, key.len() as i32)
+        };
 
         value != 0
     }
@@ -76,6 +79,7 @@ impl MiddlewareRequest {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.max_header_length);
         unsafe {
             let actual_length = raw::action_get_header(
+                REQUEST_RESSOURCE_ID,
                 buffer.as_ptr() as i32,
                 key.as_ptr() as i32,
                 key.len() as i32,
@@ -95,7 +99,7 @@ impl MiddlewareRequest {
         let mut buffer: Vec<u8> = Vec::with_capacity(self.body_size);
 
         unsafe {
-            raw::action_get_body(buffer.as_ptr() as i32);
+            raw::action_get_body(REQUEST_RESSOURCE_ID, buffer.as_ptr() as i32);
             buffer.set_len(self.body_size);
         }
 
@@ -105,7 +109,11 @@ impl MiddlewareRequest {
     /// Sets the Body on the Request to the given Data
     pub fn set_body(&self, data: &[u8]) {
         unsafe {
-            raw::action_set_body(data.as_ptr() as i32, data.len() as i32);
+            raw::action_set_body(
+                REQUEST_RESSOURCE_ID,
+                data.as_ptr() as i32,
+                data.len() as i32,
+            );
         }
     }
 }

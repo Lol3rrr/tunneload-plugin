@@ -16,5 +16,5 @@ pub trait Middleware: Config {
     }
 
     /// This Handler deals with all the incoming Requests
-    fn handle_response(&self, _resp: MiddlewareResponse) {}
+    fn handle_response(&self, _req: &MiddlewareRequest, _resp: MiddlewareResponse) {}
 }

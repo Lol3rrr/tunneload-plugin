@@ -68,12 +68,13 @@ fn response_impl(config_type: &Type, config_name: &Ident) -> TokenStream {
 
     quote! {
         #[no_mangle]
-        pub extern "C" fn apply_resp(config_size: i32, body_size: i32, max_header_length: i32) {
+        pub extern "C" fn apply_resp(config_size: i32, req_path_length: i32, req_body_size: i32, req_max_header_length: i32, resp_body_size: i32, resp_max_header_length: i32) {
             #config_tokens
 
-            let response = tunneload_plugin::MiddlewareResponse::new(body_size, max_header_length);
+            let request = tunneload_plugin::MiddlewareRequest::new(req_path_length, req_body_size, req_max_header_length);
+            let response = tunneload_plugin::MiddlewareResponse::new(resp_body_size, resp_max_header_length);
 
-            #config_name.handle_response(response);
+            #config_name.handle_response(&request, response);
         }
     }
 }

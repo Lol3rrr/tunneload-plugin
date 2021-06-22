@@ -12,3 +12,6 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 stream-httparse = { version = "0.2.3" }
 tunneload-plugin-macros = { path = "../tunneload-plugin-macros" }
+
+log = { version = "0.4" }
+tokio = { version = "1.7", default_features = false, features = ["rt"] }

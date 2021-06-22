@@ -5,14 +5,16 @@
 /// This contains all the Raw Methods exposed by the Host, Tunneload.
 pub mod raw;
 
-pub use stream_httparse::{Header, Headers, Response, StatusCode};
-pub use tunneload_plugin_macros::{parse_config, Config, MiddlewarePlugin};
+pub use stream_httparse::{Header, Headers, Method, Request, Response, StatusCode};
+pub use tunneload_plugin_macros::{parse_config, AcceptorPlugin, Config, MiddlewarePlugin};
 
 mod req;
 pub use req::*;
 
 mod resp;
 pub use resp::*;
+
+pub mod acceptor;
 
 /// Loads the Configuration String from Tunneload
 pub fn load_config_str(raw_size: i32) -> String {
@@ -30,4 +32,4 @@ pub fn load_config_str(raw_size: i32) -> String {
 pub mod logging;
 
 mod traits;
-pub use traits::{Config, Middleware};
+pub use traits::{Acceptor, Config, Middleware};
